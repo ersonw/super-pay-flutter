@@ -3,6 +3,7 @@ import 'package:admin/screens/dashboard/components/my_fields.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
+import 'components/DashBox.dart';
 import 'components/header.dart';
 
 import 'components/recent_files.dart';
@@ -40,7 +41,7 @@ class _DashboardScreen extends State<DashboardScreen> {
                   flex: 5,
                   child: Column(
                     children: [
-                      MyFiles(),
+                      DashBox(),
                       SizedBox(height: defaultPadding),
                       RecentFiles(),
                       if (Responsive.isMobile(context))
@@ -51,6 +52,7 @@ class _DashboardScreen extends State<DashboardScreen> {
                 ),
                 if (!Responsive.isMobile(context))
                   SizedBox(width: defaultPadding),
+                // Padding(padding: EdgeInsets.only(bottom: ))
                 // On Mobile means if the screen is less than 850 we dont want to show it
                 if (!Responsive.isMobile(context))
                   Expanded(

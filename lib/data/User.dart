@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 class User {
-  int id = 0;
+  String id = '';
   String? avatar;
   String? text;
-  String username = '';
+  String? username;
   String token = '';
 
   User();

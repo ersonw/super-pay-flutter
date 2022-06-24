@@ -1,3 +1,5 @@
+import 'package:admin/tools/CustomDialog.dart';
+import 'package:admin/tools/Request.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -48,7 +50,7 @@ class _LoginScreen extends State<LoginScreen>{
               children: [
                 Container(
                   margin: const EdgeInsets.only(top:10,bottom: 20),
-                  child: const Text('登录账号', style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
+                  child: const Text('后台登录', style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
                 ),
                 Container(
                   height: 45,
@@ -94,6 +96,7 @@ class _LoginScreen extends State<LoginScreen>{
                           controller: passwordController,
                           // style: TextStyle(color: Colors.white38),
                           onEditingComplete: () {
+                            _login();
                           },
                           obscureText: !eyes,
                           keyboardType: TextInputType.visiblePassword,
@@ -119,12 +122,12 @@ class _LoginScreen extends State<LoginScreen>{
                 ),
                 InkWell(
                   onTap: (){
-                    print("enter");
+                    _login();
                   },
                   child: Container(
                     // width: 120,
                     height: 45,
-                    // margin: const EdgeInsets.all(30),
+                    margin: const EdgeInsets.all(30),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: Colors.blue,
@@ -142,5 +145,16 @@ class _LoginScreen extends State<LoginScreen>{
         ),
       ),)
     );
+  }
+  _login()async{
+    if(usernameController.text.isEmpty){
+      return CustomDialog.message('账号不能为空！');
+    }
+    if(passwordController.text.isEmpty){
+      return CustomDialog.message('密码不能为空！');
+    }
+    if(await Request.userLogin(usernameController.text, passwordController.text)){
+      //
+    }
   }
 }

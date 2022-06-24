@@ -51,6 +51,8 @@ class Global {
     }else{
     }
     MinioUtil.init();
+    Request.userInfo();
+    // print(userModel.user);
   }
 
   static saveProfile() => _prefs.setString("profile", jsonEncode(profile.toJson()));

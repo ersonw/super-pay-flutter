@@ -13,8 +13,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Global.mainContext = context;
-    Global.initMain = true;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: '后台管理系统',

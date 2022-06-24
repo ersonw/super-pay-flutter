@@ -11,8 +11,7 @@ class UserModel extends ProfileChangeNotifier {
     return false;
   }
   void setToken(String token){
-    user.token = token;
-    profile.user = user;
+    profile.user.token = token;
     notifyListeners();
   }
   set user(User user){
