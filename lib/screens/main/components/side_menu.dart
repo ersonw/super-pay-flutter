@@ -18,11 +18,9 @@ class _SideMenu extends State<SideMenu> {
   @override
   void initState() {
     routeModel.addListener(() {
-      if(alive) {
-        _routes = routeModel.routes;
-        _currentRoute = routeModel.currentRoute;
-        setState(() {});
-      }
+      _routes = routeModel.routes;
+      _currentRoute = routeModel.currentRoute;
+      if(mounted) setState(() {});
     });
     super.initState();
   }

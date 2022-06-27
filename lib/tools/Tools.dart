@@ -8,8 +8,95 @@ import '../AssetsImage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../Global.dart';
+import '../constants.dart';
 
-
+buildButton(String title, {bool active=false, void Function()? callback}){
+  return InkWell(
+    onTap: (){
+      if(callback != null) callback();
+    },
+    child: Container(
+      child: Container(
+        child: Text(title,style: active? TextStyle(color: Colors.white,fontSize: 25):TextStyle(color: Colors.white.withOpacity(0.6)),),
+      ),
+    ),
+  );
+}
+buildPageButton(int page, int total,{void Function(int value)? callback}){
+  if(page==1 && total == 1) return Container();
+  List<Widget> list = [];
+  if(page>1){
+    if(page > 2){
+      list.add(buildButton('首页',callback: () {
+        page=1;
+        if(callback != null) callback(page);
+      }));
+      list.add(SizedBox(width: defaultPadding));
+    }
+    list.add(buildButton('上一页',callback: () {
+      if(page-1 > 1){
+        page--;
+      }else{
+        page=1;
+      }
+      if(callback != null) callback(page);
+    }));
+    list.add(SizedBox(width: defaultPadding));
+    if(page > 3){
+      list.add(buildButton('${page-2}',callback: () {
+        page=page-2;
+        if(callback != null) callback(page);
+      }));
+      list.add(SizedBox(width: defaultPadding));
+    }
+    if(page > 2){
+      list.add(buildButton('${page-1}',callback: () {
+        page--;
+        if(callback != null) callback(page);
+      }));
+      list.add(SizedBox(width: defaultPadding));
+    }
+  }
+  for(int i=page;i<page+3;i++){
+    // print(i);
+    if(i < total){
+      list.add(buildButton('$i',active: page == i,callback: () {
+        page=i;
+        if(callback != null) callback(page);
+      }));
+      list.add(SizedBox(width: defaultPadding));
+    }
+  }
+  if(total > page){
+    list.add(buildButton('$total',callback: () {
+      page=total;
+      if(callback != null) callback(page);
+    }));
+    list.add(SizedBox(width: defaultPadding));
+  }else if(total == page){
+    list.add(buildButton('$total',active: true,callback: () {
+      page=total;
+      if(callback != null) callback(page);
+    }));
+    list.add(SizedBox(width: defaultPadding));
+  }
+  if(page<total){
+    list.add(buildButton('下一页',callback: () {
+      if(page+1 < total){
+        page++;
+      }else{
+        page=total;
+      }
+      if(callback != null) callback(page);
+    }));
+    list.add(SizedBox(width: defaultPadding));
+  }
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    mainAxisAlignment: MainAxisAlignment.start,
+    children: list,
+  );
+}
 buildHeaderPicture({String? avatar, bool self = false}){
   if(self){
     return buildHeaderPicture(avatar: userModel.user.avatar);

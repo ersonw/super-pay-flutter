@@ -1,7 +1,9 @@
 import 'package:admin/data/DashBoxInfo.dart';
 import 'package:admin/models/MyFiles.dart';
 import 'package:admin/responsive.dart';
+import 'package:admin/tools/Request.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../../constants.dart';
 import 'DashInfo.dart';
@@ -70,10 +72,22 @@ class _FileInfoCardGridView extends State<FileInfoCardGridView> {
   List<DashBoxInfo> infos = [];
   @override
   void initState() {
-    infos = [
-      DashBoxInfo(svgSrc: "assets/icons/Documents.svg",title: '今日收款',context: '9999.00元',bottomLeft: '昨日收款',bottomRight: '10000.00元',color: Colors.blue,percentage: 10),
-    ];
+    // infos = [
+    //   DashBoxInfo(
+    //       svgSrc: SvgPicture.asset(
+    //         "assets/icons/moneybg.svg",
+    //         color: Colors.blue,),
+    //       title: '今日收款',
+    //       context: '9999.00元',
+    //       bottomLeft: '昨日收款',
+    //       bottomRight: '10000.00元',
+    //       percentage: 10),
+    // ];
+    _buildBoxInfo();
     super.initState();
+  }
+  _buildBoxInfo()async{
+    infos = await Request.dashboard();
   }
   @override
   Widget build(BuildContext context) {

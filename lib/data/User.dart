@@ -2,8 +2,10 @@ import 'dart:convert';
 
 class User {
   String id = '';
+  bool admin = false;
   String? avatar;
-  String? text;
+  String? callbackUrl;
+  String? notifyUrl;
   String? username;
   String token = '';
 
@@ -11,15 +13,19 @@ class User {
 
   User.formJson(Map<String, dynamic> json)
       : id = json['id'],
+        admin = json['admin'] ?? false,
         avatar = json['avatar'],
-        text = json['text'],
+        callbackUrl = json['callbackUrl'],
+        notifyUrl = json['notifyUrl'],
         username = json['username'],
         token = json['token'];
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'admin': admin,
         'avatar': avatar,
-        'text': text,
+        'callbackUrl': callbackUrl,
+        'notifyUrl': notifyUrl,
         'username': username,
         'token': token,
       };

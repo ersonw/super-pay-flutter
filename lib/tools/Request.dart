@@ -1,12 +1,15 @@
 import 'dart:convert';
 
+import 'package:admin/data/DashBoxInfo.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../data/User.dart';
 import '../tools/CustomDialog.dart';
 import '../tools/RequestApi.dart';
 import '../Global.dart';
 import 'Loading.dart';
 import 'MinioUtil.dart';
+import 'RouteUtil.dart';
 class Request {
   static late Dio _dio;
   static init() {
@@ -20,6 +23,9 @@ class Request {
     });
   }
   static _getDomain(){
+    if(kIsWeb && Global.isRelease){
+      return "";
+    }
     String domain = configModel.config.mainDomain;
     if(!domain.startsWith("http")){
       domain = 'http://$domain';
@@ -102,6 +108,7 @@ class Request {
       return;
     }
     userModel.user = User.formJson(jsonDecode(result));
+    RouteUtil.load();
   }
   static Future<void> userLogout()async{
     await _get(RequestApi.userLogout, {});
@@ -120,6 +127,71 @@ class Request {
         userModel.setToken(map['token']);
         userInfo();
         return true;
+      }
+    }
+    return false;
+  }
+
+  static Future<List<DashBoxInfo>> dashboard()async{
+    // Loading.show();
+    String? result = await _get(RequestApi.dashboard, {});
+    if(result==null){
+      return [];
+    }
+    // print(result);
+    return (jsonDecode(result)['list'] as List).map((e) => DashBoxInfo.fromJson(e)).toList();
+  }
+  static Future<Map<String, dynamic>> dayData()async{
+    // Loading.show();
+    String? result = await _get(RequestApi.dayData, {});
+    // print(result);
+    // List<Map<String, String>> e = (jsonDecode(result)['list'] as List<Map<String, String>>);
+    if(result==null) return {};
+    return jsonDecode(result);
+  }
+  static Future<Map<String, dynamic>> merchantDetails()async{
+    // Loading.show();
+    String? result = await _get(RequestApi.merchantDetails, {});
+    print(result);
+    if(result==null) return {};
+    return jsonDecode(result);
+  }
+  static Future<Map<String, dynamic>> orders({int page=0, String id=''})async{
+    String uri = '/$page';
+    if(id != null && id.isNotEmpty){
+      uri += '/$id';
+      // Loading.show();
+    }
+    String? result = await _get(RequestApi.orders+uri, {});
+    // print(result);
+    if(result==null) return {};
+    return jsonDecode(result);
+  }
+  static Future<bool> orderNotify(List<String> selected)async{
+    Loading.show();
+    Map<String, dynamic> data = {
+      "selected": selected,
+    };
+    String? result = await _post(RequestApi.orderNotify, data);
+    if(result!=null){
+      // print(result);
+      Map<String, dynamic> map = jsonDecode(result);
+      if(map['state'] != null) {
+        return map['state'];
+      }
+    }
+    return false;
+  }
+  static Future<bool> orderDelete(List<String> selected)async{
+    Loading.show();
+    Map<String, dynamic> data = {
+      "selected": selected,
+    };
+    String? result = await _post(RequestApi.orderDelete, data);
+    if(result!=null){
+      Map<String, dynamic> map = jsonDecode(result);
+      if(map['state'] != null) {
+        return map['state'];
       }
     }
     return false;

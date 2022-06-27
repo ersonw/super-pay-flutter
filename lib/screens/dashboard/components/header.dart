@@ -11,8 +11,12 @@ import 'package:provider/provider.dart';
 import '../../../constants.dart';
 
 class Header extends StatefulWidget {
-  const Header({
+  void Function(String value)? callback;
+  String? text;
+  Header({
     Key? key,
+    this.callback,
+    this.text,
   }) :super(key: key);
 
   @override
@@ -24,6 +28,7 @@ class _Header extends State<Header> {
   void initState() {
     userModel.addListener(() {
       _user = userModel.user;
+      if(mounted) setState(() {});
     });
     super.initState();
   }
@@ -43,7 +48,7 @@ class _Header extends State<Header> {
           ),
         if (!Responsive.isMobile(context))
           Spacer(flex: Responsive.isDesktop(context) ? 2 : 1),
-        // Expanded(child: SearchField()),
+        widget.callback==null?Container():Expanded(child: SearchField(callback: widget.callback,text: widget.text,)),
         ProfileCard(_user),
       ],
     );
@@ -54,7 +59,8 @@ class ProfileCard extends StatelessWidget {
   User user;
   List<Word> _list = [
     Word(words: "修改密码"),
-    Word(id: 1,words: "退出用户"),
+    Word(id: 1,words: "对接信息"),
+    Word(id: 3,words: "退出用户"),
   ];
   ProfileCard(this.user,{
     Key? key,
@@ -75,10 +81,10 @@ class ProfileCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Image.asset(
-            user.avatar??"assets/images/profile_pic.png",
+          user.avatar==null||user.avatar==''?Image.asset(
+            "assets/images/profile_pic.png",
             height: 38,
-          ),
+          ):Image.network(user.avatar!),
           if (!Responsive.isMobile(context))
             Padding(
               padding:
@@ -93,10 +99,13 @@ class ProfileCard extends StatelessWidget {
   }
   _handlerDropdown(Word word){
     switch(word.id){
-      case 0:
+      case 1:
         print("修改密码");
         break;
-      case 1:
+      case 2:
+        print("对接信息");
+        break;
+      case 3:
         Request.userLogout();
         break;
     }
@@ -136,13 +145,23 @@ class ProfileCard extends StatelessWidget {
 }
 
 class SearchField extends StatelessWidget {
-  const SearchField({
+  String? text;
+  void Function(String value)? callback;
+  final TextEditingController _controller = TextEditingController();
+  SearchField({
     Key? key,
+    this.callback,
+    this.text,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    _controller.text = text ?? '';
     return TextField(
+      controller: _controller,
+      onEditingComplete: () {
+        if(callback != null) callback!(_controller.text);
+      },
       decoration: InputDecoration(
         hintText: "Search",
         fillColor: secondaryColor,
@@ -152,7 +171,9 @@ class SearchField extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(10)),
         ),
         suffixIcon: InkWell(
-          onTap: () {},
+          onTap: () {
+            if(callback != null) callback!(_controller.text);
+          },
           child: Container(
             padding: EdgeInsets.all(defaultPadding * 0.75),
             margin: EdgeInsets.symmetric(horizontal: defaultPadding / 2),

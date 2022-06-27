@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:admin/Model/RouteModel.dart';
 import 'package:admin/data/MenuRoute.dart';
+import 'package:admin/tools/RouteUtil.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'RouteList.dart';
@@ -26,7 +27,6 @@ class Global {
   static bool get isRelease => const bool.fromEnvironment("dart.vm.product");
   static late SharedPreferences _prefs;
   static late BuildContext mainContext;
-  static late SideMenu sideMenu;
 
   static Profile profile = Profile();
   static bool initMain = false;
@@ -40,11 +40,7 @@ class Global {
     if (_profile != null) {
       profile = Profile.fromJson(jsonDecode(_profile));
     }
-    List<MenuRoute> routes = getRoutes();
-    sideMenu = SideMenu(
-      routes: routes,
-      currentRoute: routes.isNotEmpty ? routes[0] : MenuRoute(screen: Container()),
-    );
+    RouteUtil.init();
     Request.init();
     if(kIsWeb == false) {
       await requestPhotosPermission();

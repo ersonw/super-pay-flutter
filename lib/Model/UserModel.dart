@@ -10,6 +10,9 @@ class UserModel extends ProfileChangeNotifier {
     }
     return false;
   }
+  bool isAdmin(){
+    return user.admin;
+  }
   void setToken(String token){
     profile.user.token = token;
     notifyListeners();

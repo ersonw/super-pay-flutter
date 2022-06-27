@@ -34,43 +34,45 @@ class DashInfo extends StatelessWidget {
                 height: 40,
                 width: 40,
                 decoration: BoxDecoration(
-                  color: info.color!.withOpacity(0.1),
+                  color: Colors.blue.withOpacity(0.1),
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
                 ),
-                child: SvgPicture.asset(
-                  info.svgSrc!,
-                  color: info.color,
-                ),
+                child: info.svgSrc ?? SvgPicture.asset(
+                  "assets/icons/moneybg.svg",
+                  color: Colors.orange,),
               ),
-              Icon(Icons.more_vert, color: Colors.white54)
+              Container(
+                child: info.topRight ?? Icon(Icons.add),
+              ),
             ],
           ),
           Text(
-            info.title!,
+            '${info.title}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            info.context!,
+            '${info.context}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
           ProgressLine(
-            color: info.color,
+            color: Colors.blue,
             percentage: info.percentage,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                info.bottomLeft!,
+                '${info.bottomLeft}',
                 style: Theme.of(context)
                     .textTheme
                     .caption!
                     .copyWith(color: Colors.white70),
               ),
               Text(
-                info.bottomRight!,
+                '${info.bottomRight}',
                 style: Theme.of(context)
                     .textTheme
                     .caption!
