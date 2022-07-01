@@ -12,13 +12,13 @@ List<MenuRoute> getRoutes() {
     MenuRoute(
       title: '仪表盘',
       icon: "assets/icons/menu_dashbord.svg",
-      screen: LogingScreen(),
+      screen: DashboardScreen(),
       // screen: IPListScreen(),
     ),
     MenuRoute(
       title: '渠道总览',
       icon: "assets/icons/menu_tran.svg",
-      screen: Container(),
+      screen: DashboardScreen(),
       // admin: true,
     ),
     MenuRoute(
