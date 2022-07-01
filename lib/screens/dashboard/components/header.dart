@@ -3,6 +3,7 @@ import 'package:admin/controllers/MenuController.dart';
 import 'package:admin/data/User.dart';
 import 'package:admin/data/Word.dart';
 import 'package:admin/responsive.dart';
+import 'package:admin/screens/dashboard/MerchantScreen.dart';
 import 'package:admin/tools/Request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -105,7 +106,8 @@ class ProfileCard extends StatelessWidget {
         Navigator.push(Global.mainContext, DialogRouter(PasswordScreen()));
         break;
       case 1:
-        print("对接信息");
+        // print("对接信息");
+        Navigator.push(Global.mainContext, DialogRouter(MerchantScreen()));
         break;
       case 2:
         print("留空");

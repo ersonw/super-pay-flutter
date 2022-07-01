@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../AssetsIcon.dart';
 import '../AssetsImage.dart';
@@ -10,16 +11,67 @@ import 'package:url_launcher/url_launcher.dart';
 import '../Global.dart';
 import '../constants.dart';
 import '../responsive.dart';
+import 'CustomDialog.dart';
 
+Size boundingTextSize(String text, TextStyle style,  {int maxLines = 2^31, double maxWidth = double.infinity}) {
+  if (text == null || text.isEmpty) {
+    return Size.zero;
+  }
+  final TextPainter textPainter = TextPainter(
+      textDirection: TextDirection.ltr,
+      text: TextSpan(text: text, style: style), maxLines: maxLines)
+    ..layout(maxWidth: maxWidth);
+  return textPainter.size;
+}
+buildCopyColum(String key, dynamic value,{double? width}){
+  if(width == null) width = (Responsive.isDesktop(Global.mainContext)? MediaQuery.of(Global.mainContext).size.width /3:MediaQuery.of(Global.mainContext).size.width/1.5);
+  double tWidth = boundingTextSize(key, TextStyle()).width;
+  return Container(
+    width: width,
+    child: Container(
+      margin: EdgeInsets.all( defaultPadding),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+      ),
+      child: Container(
+        margin: EdgeInsets.only(top: 6,bottom: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('$key: '),
+            Container(
+              width: width - (defaultPadding * 2 + tWidth + 45),
+              child: Text('$value',softWrap: true,),
+            ),
+            InkWell(
+              onTap: ()async{
+                await Clipboard.setData(ClipboardData(text: '$value'));
+                CustomDialog.message("复制成功！");
+              },
+              child: Icon(Icons.copy),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 buildInput(BuildContext context,
     TextEditingController controller,
     {void Function(String text)? callback,
       String? hintText,
+      int maxLines = 1,
       bool show = true,
+      String? text,
+      TextAlign? textAlign,
+      double? width,
     }){
+  if(text != null) controller.text = '$text';
   return Container(
     padding: EdgeInsets.all(defaultPadding),
-    width: Responsive.isDesktop(context) ? MediaQuery.of(context).size.width / 3 : MediaQuery.of(context).size.width / 1.5,
+    width: width ?? (Responsive.isDesktop(context) ? MediaQuery.of(context).size.width / 3 : MediaQuery.of(context).size.width / 1.5),
     child: Container(
       // margin: const EdgeInsets.all(15),
         alignment: Alignment.center,
@@ -28,8 +80,8 @@ buildInput(BuildContext context,
           borderRadius: BorderRadius.all(Radius.circular(6)),
         ),
         child: TextField(
-          maxLines: 1,
-          textAlign: TextAlign.center,
+          maxLines: maxLines,
+          textAlign: textAlign ?? TextAlign.center,
           controller: controller,
           obscureText: !show,
           // autofocus: true,

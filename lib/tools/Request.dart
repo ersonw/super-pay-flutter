@@ -158,6 +158,23 @@ class Request {
     if(result==null) return {};
     return jsonDecode(result);
   }
+  static Future<Map<String, dynamic>> userDetails()async{
+    // Loading.show();
+    String? result = await _get(RequestApi.userDetails, {});
+    // print(result);
+    if(result==null) return {};
+    return jsonDecode(result);
+  }
+  static Future<bool> userDetailsChange(String callbackUrl, String notifyUrl)async{
+    Loading.show();
+    Map<String, dynamic> data = {
+      "callbackUrl": callbackUrl,
+      "notifyUrl": notifyUrl,
+    };
+    String? result = await _post(RequestApi.userDetailsChange, data);
+    if(result ==null || jsonDecode(result)['state'] == null || jsonDecode(result)['state'] == false) return false;
+    return true;
+  }
   static Future<Map<String, dynamic>> merchantDetails()async{
     // Loading.show();
     String? result = await _get(RequestApi.merchantDetails, {});

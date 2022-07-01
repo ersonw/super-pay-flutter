@@ -3,6 +3,8 @@ class RequestApi {
   static const userInfo  = '/api/user/info';
   static const userLogout  = '/api/user/logout';
   static const userPassword = '/api/user/password';
+  static const userDetails = '/api/user/details';
+  static const userDetailsChange = '/api/user/details/change';
 
   static const dashboard  = '/api/dashboard';
   static const dayData  = '/api/dayData';
