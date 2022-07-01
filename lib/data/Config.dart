@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class Config {
-  String mainDomain = "pay.telebott.com";
+  String mainDomain = "127.0.0.1:8000";
   String? channelDomain;
   Config();
   Config.formJson(Map<String, dynamic> json):

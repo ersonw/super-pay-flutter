@@ -43,8 +43,8 @@ class Request {
       // contentType: Headers.jsonContentType,
       responseType: ResponseType.json,
       receiveDataWhenStatusError: false,
-      connectTimeout: 30000,
-      receiveTimeout: 3000,
+      // connectTimeout: 3000,
+      receiveTimeout: 30000,
     );
   }
 
@@ -56,9 +56,9 @@ class Request {
           'Token': userModel.hasToken() ? userModel.user.token : '',
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        responseType: ResponseType.json,
-        receiveDataWhenStatusError: false,
-        receiveTimeout: 30000,
+        // responseType: ResponseType.json,
+        // receiveDataWhenStatusError: false,
+        // receiveTimeout: 30000,
       ));
       Loading.dismiss();
       if(response.statusCode == 200 && response.data != null){
@@ -79,12 +79,12 @@ class Request {
       Response response = await _dio.post(path,data: Global.encryptCode(jsonEncode(data)), options: Options(
       // Response response = await _dio.post(path,data: data, options: Options(
         headers: {
-          // "Content-Type": "application/json",
+          "Content-Type": "application/json",
           'Token': userModel.hasToken() ? userModel.user.token : '',
         },
-        responseType: ResponseType.json,
-        receiveDataWhenStatusError: false,
-        receiveTimeout: 30000,
+        // responseType: ResponseType.json,
+        // receiveDataWhenStatusError: false,
+        // receiveTimeout: 30000,
       ));
       Loading.dismiss();
       if(response.statusCode == 200 && response.data != null){
@@ -131,7 +131,16 @@ class Request {
     }
     return false;
   }
-
+  static Future<bool> userPassword(String oldValue, String newValue)async{
+    Loading.show();
+    Map<String, dynamic> data = {
+      "oldValue": Global.generateMd5(oldValue),
+      "newValue": Global.generateMd5(newValue),
+    };
+    String? result = await _post(RequestApi.userPassword, data);
+    if(result ==null || jsonDecode(result)['state'] == null || jsonDecode(result)['state'] == false) return false;
+    return true;
+  }
   static Future<List<DashBoxInfo>> dashboard()async{
     // Loading.show();
     String? result = await _get(RequestApi.dashboard, {});
@@ -152,7 +161,7 @@ class Request {
   static Future<Map<String, dynamic>> merchantDetails()async{
     // Loading.show();
     String? result = await _get(RequestApi.merchantDetails, {});
-    print(result);
+    // print(result);
     if(result==null) return {};
     return jsonDecode(result);
   }
@@ -163,6 +172,57 @@ class Request {
       // Loading.show();
     }
     String? result = await _get(RequestApi.orders+uri, {});
+    // print(result);
+    if(result==null) return {};
+    return jsonDecode(result);
+  }
+  static Future<Map<String, dynamic>> loging({int page=0})async{
+    String? result = await _get(RequestApi.loging+'/$page', {});
+    // print(result);
+    if(result==null) return {};
+    return jsonDecode(result);
+  }
+  static Future<Map<String, dynamic>> ipList({int page=0, String id=''})async{
+    String uri = '/$page';
+    if(id != null && id.isNotEmpty){
+      uri += '/$id';
+      // Loading.show();
+    }
+    String? result = await _get(RequestApi.ipList+uri, {});
+    // print(result);
+    if(result==null) return {};
+    return jsonDecode(result);
+  }
+  static Future<bool> ipListAdd(String address)async{
+    Loading.show();
+    String? result = await _get(RequestApi.ipListAdd, { 'address': address });
+    // print(result);
+    if(result==null|| jsonDecode(result)['add'] == null || jsonDecode(result)['add'] == false) return false;
+    return true;
+  }
+  static Future<bool> ipListDel(List<String> selected)async{
+    Loading.show();
+    Map<String, dynamic> data = {
+      "selected": selected,
+    };
+    String? result = await _post(RequestApi.ipListDel, data);
+    if(result!=null){
+      Map<String, dynamic> map = jsonDecode(result);
+      if(map['state'] != null) {
+        return map['state'];
+      }
+    }
+    return false;
+  }
+  static Future<bool> ipListClear()async{
+    Loading.show();
+    String? result = await _get(RequestApi.ipListClear, {});
+    // print(result);
+    if(result==null|| jsonDecode(result)['clear'] == null || jsonDecode(result)['clear'] == false) return false;
+    return true;
+  }
+  static Future<Map<String, dynamic>> orderDetails(String id)async{
+    String? result = await _get(RequestApi.orderDetails.replaceAll('{id}', id), {});
     // print(result);
     if(result==null) return {};
     return jsonDecode(result);
@@ -196,4 +256,5 @@ class Request {
     }
     return false;
   }
+
 }

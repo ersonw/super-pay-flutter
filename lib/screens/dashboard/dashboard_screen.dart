@@ -89,7 +89,8 @@ class _DashboardScreen extends State<DashboardScreen> {
                       _buildDayData(),
                       if (Responsive.isMobile(context))
                         SizedBox(height: defaultPadding),
-                      if (Responsive.isMobile(context)) userModel.user.admin?AdminDetails(): MerchantDetails(),
+                      if (Responsive.isMobile(context)) MerchantDetails(),
+                      // if (Responsive.isMobile(context)) userModel.user.admin?AdminDetails(): MerchantDetails(),
                     ],
                   ),
                 ),
@@ -100,7 +101,8 @@ class _DashboardScreen extends State<DashboardScreen> {
                 if (!Responsive.isMobile(context))
                   Expanded(
                     flex: 2,
-                    child:  userModel.user.admin?AdminDetails():MerchantDetails(),
+                    child:  MerchantDetails(),
+                    // child:  userModel.user.admin?AdminDetails():MerchantDetails(),
                   ),
               ],
             )

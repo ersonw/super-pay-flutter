@@ -5,58 +5,57 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../../constants.dart';
 
-class RecentTable extends StatefulWidget {
+class RecentTable extends StatelessWidget {
   String? title;
   List<Map<String, dynamic>> data;
-  void Function(Map<String, dynamic> row)? callback;
+  Map<String, dynamic>? columns;
+  void Function(int value)? callback;
   void Function(List<int> index)? onSelectChanged;
+  bool sequence;
   bool clear;
   RecentTable(this.data,{
     this.title,
     this.callback,
     this.onSelectChanged,
     this.clear =false,
+    this.sequence = false,
+    this.columns,
     Key? key,
   }) : super(key: key);
-  @override
-  _RecentTable createState() =>_RecentTable();
-}
-class _RecentTable extends State<RecentTable> {
   List<bool> selected = [];
-  List<String> column = [];
-  @override
-  void initState() {
-    if(widget.data.isNotEmpty) {
-      column = widget.data[widget.data.length-1].keys.toList();
+  int? select;
+  Map<String, dynamic> column = {};
+  _getColumn(){
+    for(int i = selected.length-1; i < data.length; i++) {
+      selected.add(false);
     }
-    // print(column);
-    super.initState();
-  }
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
+    if(sequence){
+      column['index'] = '#';
+    }
+    if(columns != null){
+      column.addAll(columns!);
+    }else if(data.isNotEmpty){
+      List<String> keys = data[0].keys.toList();
+      keys.sort((a, b) => a.length.compareTo(b.length));
+      for(String key in keys){
+        column[key] = key;
+      }
+    }
   }
   _buildColumns(){
     List<DataColumn> columns = [];
-    for(int i=0;i < widget.data.length;i++){
-      if(selected.length < i+1){
-        selected.add(false);
-      }
-    }
-    column.sort((a, b) => a.length.compareTo(b.length));
-    // print(column);
-    for(int i = 0; i < column.length; i++){
-        columns.add(
-            DataColumn(
-              label: Text('${column[i]}',softWrap: true,maxLines: 3,overflow: TextOverflow.fade,),
-            ));
-    }
+    column.forEach((key, value) {
+      columns.add(
+          DataColumn(
+            label: Text('$value',softWrap: true,maxLines: 3,overflow: TextOverflow.fade,),
+          ));
+    });
     return columns;
   }
   @override
   Widget build(BuildContext context) {
-    if(widget.clear){
+    _getColumn();
+    if(clear){
       for(int i = 0; i < selected.length; i++) {
         selected[i]=false;
       }
@@ -71,7 +70,7 @@ class _RecentTable extends State<RecentTable> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "${widget.title ?? ''}",
+            "${title ?? ''}",
             style: Theme.of(context).textTheme.subtitle1,
           ),
           SizedBox(
@@ -80,33 +79,49 @@ class _RecentTable extends State<RecentTable> {
               columnSpacing: defaultPadding,
               minWidth: 600,
               columns: _buildColumns(),
-              rows: List.generate(
-                widget.data.length,
-                    (index) => recentTableDataRow(index),
-              ),
+              rows: _buildRows(),
             ),
           ),
         ],
       ),
     );
   }
-  DataRow recentTableDataRow(int index) {
-    Map<String, dynamic> row = widget.data[index];
-    List<DataCell> calls = [];
-    for (int i = 0; i < column.length; i++) {
-      calls.add(DataCell(
-        Text('${row[column[i]]}'),
-        // onTap: (){
-        // if(widget.callback != null) widget.callback!(row);
-        // },
-      ));
+  List<DataRow> _buildRows(){
+    List<DataRow> rows = [];
+    for(int i = 0; i < data.length; i++) {
+      rows.add(recentTableDataRow(data[i],i));
     }
+    return rows;
+  }
+  DataRow recentTableDataRow(Map<String, dynamic> row,int index) {
+    // Map<String, dynamic> row = widget.data[index];
+    List<DataCell> calls = [];
+    column.forEach((key, value) {
+      // print('$key == ${row[value]}');
+      if(key == 'index'){
+        calls.add(DataCell(
+          Text('${index+1}'),
+            // onTap: widget.callback == null?null:(){
+            //   if(widget.callback != null) widget.callback!(index);
+            //   select=index;
+            //   if(mounted) setState(() {});
+            // }
+        ));
+      } else{
+        calls.add(DataCell(
+          Text('${row[key]}'),
+          onTap: callback == null?null:(){
+            if(callback != null) callback!(index);
+            select=index;
+          }
+        ));
+      }
+    });
     return DataRow(
-      onLongPress: widget.callback == null?null:(){
-        if(widget.callback != null) widget.callback!(row);
-      },
+      color: select==null?null: (select==index?MaterialStateProperty.all(Colors.white.withOpacity(0.3)):null),
       selected: selected[index],
-      onSelectChanged: widget.onSelectChanged==null?null:(bool? e){
+      onSelectChanged: onSelectChanged==null?null:(bool? e){
+        select=index;
         if(e != null)selected[index] = e;
         List<int> selects = [];
         for(int i=0; i<selected.length; i++) {
@@ -114,8 +129,7 @@ class _RecentTable extends State<RecentTable> {
             selects.add(i);
           }
         }
-        widget.onSelectChanged!(selects);
-        if(mounted) setState(() {});
+        onSelectChanged!(selects);
       },
       cells: calls,
     );

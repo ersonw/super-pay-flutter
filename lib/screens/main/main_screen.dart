@@ -39,8 +39,10 @@ class _MainScreen extends State<MainScreen>{
   }
   @override
   Widget build(BuildContext context) {
-    Global.mainContext = context;
-    Global.initMain = true;
+    // if(Global.initMain == false){
+      Global.mainContext = context;
+      Global.initMain = true;
+    // }
     return Scaffold(
       key: context.read<MenuController>().scaffoldKey,
       drawer: SideMenu(),

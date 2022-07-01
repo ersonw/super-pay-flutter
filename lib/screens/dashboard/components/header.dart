@@ -9,6 +9,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants.dart';
+import '../PasswordScreen.dart';
 
 class Header extends StatefulWidget {
   void Function(String value)? callback;
@@ -99,11 +100,15 @@ class ProfileCard extends StatelessWidget {
   }
   _handlerDropdown(Word word){
     switch(word.id){
+      case 0:
+        // print("修改密码");
+        Navigator.push(Global.mainContext, DialogRouter(PasswordScreen()));
+        break;
       case 1:
-        print("修改密码");
+        print("对接信息");
         break;
       case 2:
-        print("对接信息");
+        print("留空");
         break;
       case 3:
         Request.userLogout();

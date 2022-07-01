@@ -9,7 +9,51 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../Global.dart';
 import '../constants.dart';
+import '../responsive.dart';
 
+buildInput(BuildContext context,
+    TextEditingController controller,
+    {void Function(String text)? callback,
+      String? hintText,
+      bool show = true,
+    }){
+  return Container(
+    padding: EdgeInsets.all(defaultPadding),
+    width: Responsive.isDesktop(context) ? MediaQuery.of(context).size.width / 3 : MediaQuery.of(context).size.width / 1.5,
+    child: Container(
+      // margin: const EdgeInsets.all(15),
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          color: Colors.white10,
+          borderRadius: BorderRadius.all(Radius.circular(6)),
+        ),
+        child: TextField(
+          maxLines: 1,
+          textAlign: TextAlign.center,
+          controller: controller,
+          obscureText: !show,
+          // autofocus: true,
+          // style: TextStyle(color: Colors.white38),
+          onSubmitted: (String text) {
+          },
+          onEditingComplete: (){
+            if(callback !=null) callback(controller.text);
+          },
+          keyboardType: TextInputType.text,
+          textInputAction: TextInputAction.done,
+          decoration:  InputDecoration(
+            hintText: hintText??'',
+            hintStyle: const TextStyle(color: Colors.white30,fontSize: 13,fontWeight: FontWeight.bold),
+            border: InputBorder.none,
+            filled: true,
+            fillColor: Colors.transparent,
+            contentPadding: const EdgeInsets.only(top: 10,bottom: 10),
+            isDense: true,
+          ),
+        )
+    ),
+  );
+}
 buildButton(String title, {bool active=false, void Function()? callback}){
   return InkWell(
     onTap: (){

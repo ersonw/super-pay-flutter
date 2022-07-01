@@ -24,6 +24,7 @@ class IPListScreen extends StatefulWidget {
 }
 class _IPListScreen extends State<IPListScreen> {
   List<Map<String, dynamic>> data = [];
+  final TextEditingController _controller = TextEditingController();
   int total = 1;
   int page = 1;
   String? text;
@@ -45,7 +46,7 @@ class _IPListScreen extends State<IPListScreen> {
       page--;
       return;
     }
-    Map<String, dynamic> map = await Request.orders(page: page,id: text??'');
+    Map<String, dynamic> map = await Request.ipList(page: page,id: text??'');
     if(map['total'] != null) total = map['total'];
     if(map['list'] != null) data = (map['list'] as List).map((e) => (e as Map<String,dynamic>)).toList();
     if(mounted) setState(() {});
@@ -67,6 +68,59 @@ class _IPListScreen extends State<IPListScreen> {
               text: text,
             ),
             SizedBox(height: defaultPadding),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(defaultPadding),
+                  width: Responsive.isDesktop(context) ? MediaQuery.of(context).size.width / 3 : MediaQuery.of(context).size.width / 1.5,
+                  child: Container(
+                      margin: const EdgeInsets.all(15),
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        color: Colors.white10,
+                        borderRadius: BorderRadius.all(Radius.circular(6)),
+                      ),
+                      child: TextField(
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        controller: _controller,
+                        autofocus: true,
+                        // style: TextStyle(color: Colors.white38),
+                        onSubmitted: (String text) {
+                        },
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.done,
+                        decoration:  InputDecoration(
+                          hintText: '添加IP白名单地址',
+                          hintStyle: const TextStyle(color: Colors.white30,fontSize: 13,fontWeight: FontWeight.bold),
+                          border: InputBorder.none,
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          contentPadding: const EdgeInsets.only(top: 10,bottom: 10),
+                          isDense: true,
+                        ),
+                      )
+                  ),
+                ),
+                InkWell(
+                  onTap: (){
+                    _add();
+                  },
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.all(Radius.circular(6)),
+                    ),
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 6,bottom: 6,left: 12,right: 12),
+                      child: Text('添加'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: defaultPadding),
             _buildSelectButton(),
             // SizedBox(height: defaultPadding),
             Row(
@@ -79,13 +133,22 @@ class _IPListScreen extends State<IPListScreen> {
                       SizedBox(height: defaultPadding),
                       data.isEmpty?Container():RecentTable(
                         data,
-                        title: '订单数据',
+                        sequence: true,
+                        title: '登录IP白名单',
                         clear:clear,
-                        onSelectChanged: userModel.isAdmin() == false?null: (List<int> value){
-                          // onSelectChanged: (List<int> value){
+                        // onSelectChanged: userModel.isAdmin() == false?null: (List<int> value){
+                          onSelectChanged: (List<int> value){
                           selected = value;
                           clear = false;
                           if(mounted) setState(() {});
+                        },
+                        columns: {
+                          'address':'IP',
+                          'addTime':'添加时间',
+                          // 'updateTime':'更新时间',
+                        },
+                        callback: (value){
+
                         },
                       ),
                       SizedBox(height: defaultPadding),
@@ -103,66 +166,66 @@ class _IPListScreen extends State<IPListScreen> {
       ),
     );
   }
-  _orderNotify()async{
-    if(selected.isEmpty) return;
-    List<String> selectList = [];
-    for(int i = 0; i < selected.length; i++){
-      if(selected[i] < data.length){
-        selectList.add(data[selected[i]]['ID']);
+  _add()async{
+    if(_controller.text.isNotEmpty){
+      if(await Request.ipListAdd(_controller.text)){
+        _getData();
+        _controller.text = '';
+        CustomDialog.message('添加成功!');
+      }else{
+        CustomDialog.message('添加失败!');
       }
     }
-    if(await Request.orderNotify(selectList) == true){
-      _getData();
-      clear = true;
-      CustomDialog.message('批量通知成功!');
-    }else{
-      CustomDialog.message('通知失败!');
-    }
-    if(mounted) setState(() {});
-
   }
-  _orderDelete()async{
+  _delete()async{
     if(selected.isEmpty) return;
     List<String> selectList = [];
     for(int i = 0; i < selected.length; i++){
       if(selected[i] < data.length){
-        selectList.add(data[selected[i]]['ID']);
+        selectList.add(data[selected[i]]['id']);
       }
     }
-    if(await Request.orderDelete(selectList) == true){
+    if(await Request.ipListDel(selectList) == true){
       _getData();
       clear = true;
       CustomDialog.message('批量删除成功!');
     }else{
-      CustomDialog.message('批量删除!');
+      CustomDialog.message('批量删除失败!');
     }
     if(mounted) setState(() {});
 
   }
+  _clear()async{
+    if(await Request.ipListClear() == true){
+      _getData();
+      CustomDialog.message('清除成功!');
+    }
+  }
   _buildSelectButton(){
-    if(selected.isEmpty) return Container();
     List<Widget> list = [];
-    list.add(TextButton(onPressed: (){
-      _orderDelete();
-    }, child: Container(
+    if(selected.isNotEmpty){
+      list.add(TextButton(onPressed: (){
+        _delete();
+      }, child: Container(
+        decoration: BoxDecoration(
+          color: Colors.redAccent,
+          borderRadius: BorderRadius.all(Radius.circular(5)),
+        ),
+        child: Container(
+          margin: const EdgeInsets.only(left: 12,right: 12,top: 6,bottom: 6),
+          child: Text('批量删除(${selected.length}项)',style: TextStyle(color: Colors.white),),
+        ),
+      )));
+      list.add(SizedBox(width: defaultPadding));
+    }
+    list.add(TextButton(onPressed: _clear, child: Container(
       decoration: BoxDecoration(
-        color: Colors.redAccent,
+        color: Colors.grey,
         borderRadius: BorderRadius.all(Radius.circular(5)),
       ),
       child: Container(
         margin: const EdgeInsets.only(left: 12,right: 12,top: 6,bottom: 6),
-        child: Text('批量删除(${selected.length}项)',style: TextStyle(color: Colors.white),),
-      ),
-    )));
-    list.add(SizedBox(width: defaultPadding));
-    list.add(TextButton(onPressed: _orderNotify, child: Container(
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadius.all(Radius.circular(5)),
-      ),
-      child: Container(
-        margin: const EdgeInsets.only(left: 12,right: 12,top: 6,bottom: 6),
-        child: Text('批量通知(${selected.length}项)',style: TextStyle(color: Colors.white),),
+        child: Text('清空所有',style: TextStyle(color: Colors.white),),
       ),
     )));
     list.add(SizedBox(width: defaultPadding));

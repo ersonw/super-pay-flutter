@@ -1,4 +1,5 @@
 import 'package:admin/screens/dashboard/IPListScreen.dart';
+import 'package:admin/screens/dashboard/LogingScreen.dart';
 import 'package:admin/screens/dashboard/order_screen.dart';
 
 import 'screens/dashboard/dashboard_screen.dart';
@@ -11,7 +12,7 @@ List<MenuRoute> getRoutes() {
     MenuRoute(
       title: '仪表盘',
       icon: "assets/icons/menu_dashbord.svg",
-      screen: DashboardScreen(),
+      screen: LogingScreen(),
       // screen: IPListScreen(),
     ),
     MenuRoute(
@@ -57,7 +58,7 @@ List<MenuRoute> getRoutes() {
     MenuRoute(
       title: '登录日志',
       icon: "assets/icons/menu_task.svg",
-      screen: DashboardScreen(),
+      screen: LogingScreen(),
     ),
   ];
 }
